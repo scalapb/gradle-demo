@@ -1,0 +1,69 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
+  }
+}
+
+plugins {
+    // Apply the scala plugin to add support for Scala
+    id 'com.google.protobuf' version '0.8.8'
+    id 'scala'
+}
+
+repositories {
+    jcenter()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
+}
+
+dependencies {
+    // Use Scala 2.12 in our library project
+    implementation 'org.scala-lang:scala-library:2.12.8'
+
+    // Use Scalatest for testing our library
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.scalatest:scalatest_2.12:3.0.5'
+
+    // Need scala-xml at test runtime
+    testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
+    compile 'com.thesamet.scalapb:scalapb-runtime_2.12:0.9.0-M4'
+}
+
+protobuf {
+  plugins {
+    scalapb {
+      artifact = 'com.thesamet.scalapb:protoc-gen-scalapb:0.9.0-SNAPSHOT:universal'
+    }
+  }
+
+  generateProtoTasks {
+    all().each { task ->
+      task.builtins {
+          remove java
+      }
+      task.plugins {
+          scalapb {
+            // option 'flat_package'
+          }
+      }
+    }
+  }
+}
+
+task run(type: JavaExec, dependsOn: classes) {
+    main = 'scalapb.demo.Demo'
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.runtime
+}
+
+sourceSets {
+  main {
+    scala {
+        srcDirs "${protobuf.generatedFilesBaseDir}/main/scalapb"
+    }
+  }
+}
