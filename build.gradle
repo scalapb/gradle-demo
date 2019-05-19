@@ -67,6 +67,7 @@ task run(type: JavaExec, dependsOn: classes) {
     classpath configurations.runtime
 }
 
+// Add geneated Scala code as a source directory
 sourceSets {
   main {
     scala {
