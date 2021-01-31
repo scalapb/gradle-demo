@@ -14,7 +14,7 @@ plugins {
 }
 
 ext {
-    scalapbVersion = '0.9.0-M5'
+    scalapbVersion = '0.10.10'
 }
 
 repositories {
@@ -41,8 +41,8 @@ protobuf {
   plugins {
     scalapb {
         artifact = (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem().isWindows()) ?
-            "com.thesamet.scalapb:protoc-gen-scalapb:${scalapbVersion}:windows@bat" :
-            "com.thesamet.scalapb:protoc-gen-scalapb:${scalapbVersion}:unix@sh"
+            "com.thesamet.scalapb:protoc-gen-scala:${scalapbVersion}:windows@bat" :
+            "com.thesamet.scalapb:protoc-gen-scala:${scalapbVersion}:unix@sh"
     }
   }
 
