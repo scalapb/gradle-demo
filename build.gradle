@@ -1,10 +1,10 @@
 buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
-  }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.8'
+    }
 }
 
 plugins {
@@ -14,7 +14,8 @@ plugins {
 }
 
 ext {
-    scalapbVersion = '0.10.10'
+    scalapbVersion = '0.11.2'
+    ziopbVersion = '0.5.0'
 }
 
 repositories {
@@ -24,6 +25,9 @@ repositories {
 dependencies {
     // Use Scala 2.12 in our library project
     implementation 'org.scala-lang:scala-library:2.12.8'
+    implementation "com.thesamet.scalapb:scalapb-runtime-grpc_2.12:${scalapbVersion}"
+    implementation "com.thesamet.scalapb.zio-grpc:zio-grpc-core_2.12:${ziopbVersion}"
+    implementation("dev.zio:zio_2.12:1.0.7")
 
     // Use Scalatest for testing our library
     testImplementation 'junit:junit:4.12'
@@ -35,30 +39,35 @@ dependencies {
 }
 
 protobuf {
-  protoc {
-    artifact = 'com.google.protobuf:protoc:3.7.1'
-  }
-  plugins {
-    scalapb {
-        artifact = (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem().isWindows()) ?
-            "com.thesamet.scalapb:protoc-gen-scala:${scalapbVersion}:windows@bat" :
-            "com.thesamet.scalapb:protoc-gen-scala:${scalapbVersion}:unix@sh"
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.7.1'
     }
-  }
+    plugins {
+        def os = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem()
+        def artifactClassifier = os.isWindows() ? "windows@bat" : "unix@sh"
+        scalapb {
+            artifact = "com.thesamet.scalapb:protoc-gen-scala:${scalapbVersion}:$artifactClassifier"
+        }
+        ziopb {
+            artifact = "com.thesamet.scalapb.zio-grpc:protoc-gen-zio:${ziopbVersion}:$artifactClassifier"
+        }
+    }
 
-  generateProtoTasks {
-    all().each { task ->
-      task.builtins {
-          remove java
-      }
-      task.plugins {
-          scalapb {
-            // add any ScalaPB generator options here. See: https://scalapb.github.io/scalapbc.html#passing-generator-parameters
-            // option 'flat_package'
-          }
-      }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                remove java
+            }
+            task.plugins {
+                scalapb {
+                    option 'grpc'
+                }
+                ziopb{
+
+                }
+            }
+        }
     }
-  }
 }
 
 task run(type: JavaExec, dependsOn: classes) {
@@ -71,7 +80,7 @@ task run(type: JavaExec, dependsOn: classes) {
 sourceSets {
   main {
     scala {
-        srcDirs "${protobuf.generatedFilesBaseDir}/main/scalapb"
+        srcDirs = ["${protobuf.generatedFilesBaseDir}/main/scalapb","${protobuf.generatedFilesBaseDir}/main/ziopb"]
     }
   }
 }
