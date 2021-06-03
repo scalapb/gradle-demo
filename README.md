@@ -1,3 +1,5 @@
+# Scala 3 branch - does not work yet.
+
 This repository is an example of how to use Gradle to generate ScalaPB
 sources.
 

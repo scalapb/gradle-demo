@@ -14,7 +14,7 @@ plugins {
 }
 
 ext {
-    scalapbVersion = '0.10.10'
+    scalapbVersion = '0.11.3'
 }
 
 repositories {
@@ -23,15 +23,15 @@ repositories {
 
 dependencies {
     // Use Scala 2.12 in our library project
-    implementation 'org.scala-lang:scala-library:2.12.8'
+    implementation 'org.scala-lang:scala3-compiler_3:3.0.0'
 
     // Use Scalatest for testing our library
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.scalatest:scalatest_2.12:3.0.5'
+    testImplementation 'org.scalatest:scalatest_3:3.2.9'
 
     // Need scala-xml at test runtime
-    testRuntimeOnly 'org.scala-lang.modules:scala-xml_2.12:1.1.1'
-    compile "com.thesamet.scalapb:scalapb-runtime_2.12:${scalapbVersion}"
+    testRuntimeOnly 'org.scala-lang.modules:scala-xml_3:2.0.0'
+    compile "com.thesamet.scalapb:scalapb-runtime_3:${scalapbVersion}"
 }
 
 protobuf {
